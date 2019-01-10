@@ -17,12 +17,29 @@ mongoose.connect(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+const { auth } = require("./middleware/auth");
 
 // Models
 const { User } = require("./models/user");
 
 // Routes
 // todo: move to routes file
+
+/**
+ * @route  GET api/users/auth
+ * @desc   Check if user is authorized
+ * @access Public
+ */
+app.post("/api/users/auth", auth, (req, res) => {
+  res.status(200).json({
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    firstName: req.user.firstName,
+    lastName: req.user.lastName,
+    role: req.user.role
+  });
+});
 
 /**
  * @route  GET api/users/register
@@ -34,8 +51,35 @@ app.post("/api/users/register", (req, res) => {
   user.save((err, doc) => {
     if (err) return res.json({ success: false, err });
     res.status(200).json({
-      success: true,
-      userData: doc
+      success: true
+    });
+  });
+});
+
+/**
+ * @route  GET api/users/login
+ * @desc   User login
+ * @access Public
+ */
+app.post("/api/users/login", (req, res) => {
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (!user)
+      return res.json({
+        loginSuccess: false,
+        message: "Authorization failed, email not found"
+      });
+    user.comparePassword(req.body.password, (err, isMatch) => {
+      if (!isMatch)
+        return res.json({ loginSuccess: false, message: "Invalid password" });
+      user.generateToken((err, user) => {
+        if (err) return res.status(400).send(err);
+        res
+          .cookie("x_auth", user.token)
+          .status(200)
+          .json({
+            loginSuccess: true
+          });
+      });
     });
   });
 });
