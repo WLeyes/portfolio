@@ -4,40 +4,65 @@ const bcrypt = require("bcryptjs");
 const SALT = 10;
 require("dotenv").config();
 
-const userSchema = mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: 1
+const userSchema = mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: 1
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 5
+    },
+    firstName: {
+      type: String,
+      required: true,
+      maxlength: 40
+    },
+    lastName: {
+      type: String,
+      required: true,
+      maxlength: 40
+    },
+    company: {
+      type: String,
+      maxlength: 40
+    },
+    phoneNumber: {
+      type: String,
+      maxlength: 40
+    },
+    role: {
+      type: Number,
+      default: 0
+    },
+    token: {
+      type: String
+    },
+    social_media: {
+      facebook: {
+        type: String
+      },
+      linkedin: {
+        type: String
+      },
+      instagram: {
+        type: String
+      },
+      youtube: {
+        type: String
+      }
+    },
+    messages: {
+      type: Array,
+      default: []
+    }
   },
-  password: {
-    type: String,
-    required: true,
-    minlength: 5
-  },
-  firstName: {
-    type: String,
-    required: true,
-    maxlength: 40
-  },
-  lastName: {
-    type: String,
-    required: true,
-    maxlength: 40
-  },
-  role: {
-    type: Number,
-    default: 0
-  },
-  token: {
-    type: String
-  },
-  messages: {
-    type: Array,
-    default: []
-  }
-});
+  { timestamps: true }
+);
 
 // Check if password is being set or modified - if so, then hash password
 // using es5 to ensure functionality

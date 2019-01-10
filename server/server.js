@@ -18,9 +18,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 const { auth } = require("./middleware/auth");
+const { admin } = require("./middleware/admin");
 
 // Models
 const { User } = require("./models/user");
+const { Project } = require("./models/project");
 
 // Routes
 // todo: move to routes file
@@ -87,7 +89,7 @@ app.post("/api/users/login", (req, res) => {
 /**
  * @route  GET api/user/logout
  * @desc   Logout current user
- * @access Public
+ * @access Private
  */
 app.get("/api/user/logout", auth, (req, res) => {
   User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, doc) => {
@@ -95,6 +97,46 @@ app.get("/api/user/logout", auth, (req, res) => {
     return res.status(200).send({
       success: true
     });
+  });
+});
+
+/**
+ * @route  POST api/project/create
+ * @desc   Create project for profile
+ * @access Private
+ */
+app.post("/api/project/create", auth, admin, (req, res) => {
+  const project = new Project(req.body);
+  project.save((err, doc) => {
+    if (err) return res.json({ success: false, err });
+    res.status(200).json({
+      success: true,
+      project: doc
+    });
+  });
+});
+
+/**
+ * @route  get api/projects
+ * @desc   get all projects
+ * @access Public
+ */
+app.get("/api/projects", (req, res) => {
+  Project.find({}, (err, projects) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).send(projects);
+  });
+});
+
+/**
+ * @route  get api/project/:id
+ * @desc   get project by id
+ * @access Public
+ */
+app.get("/api/project/:id", (req, res) => {
+  Project.findById(req.params.id, (err, project) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).send(project);
   });
 });
 
