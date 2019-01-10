@@ -38,6 +38,7 @@ const userSchema = mongoose.Schema({
 });
 
 // Check if password is being set or modified - if so, then hash password
+// using es5 to ensure functionality
 userSchema.pre("save", function(next) {
   var user = this;
   if (user.isModified("password")) {
