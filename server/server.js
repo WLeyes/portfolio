@@ -26,7 +26,7 @@ const { User } = require("./models/user");
 // todo: move to routes file
 
 /**
- * @route  GET api/users/auth
+ * @route  POST api/users/auth
  * @desc   Check if user is authorized
  * @access Public
  */
@@ -42,7 +42,7 @@ app.post("/api/users/auth", auth, (req, res) => {
 });
 
 /**
- * @route  GET api/users/register
+ * @route  POST api/users/register
  * @desc   User registration
  * @access Public
  */
@@ -57,7 +57,7 @@ app.post("/api/users/register", (req, res) => {
 });
 
 /**
- * @route  GET api/users/login
+ * @route  POST api/users/login
  * @desc   User login
  * @access Public
  */
@@ -80,6 +80,20 @@ app.post("/api/users/login", (req, res) => {
             loginSuccess: true
           });
       });
+    });
+  });
+});
+
+/**
+ * @route  GET api/user/logout
+ * @desc   Logout current user
+ * @access Public
+ */
+app.get("/api/user/logout", auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, doc) => {
+    if (err) return res.json({ success: false, err });
+    return res.status(200).send({
+      success: true
     });
   });
 });
