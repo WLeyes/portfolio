@@ -6,6 +6,7 @@ const app = express();
 // Mongoose
 const mongoose = require("mongoose");
 mongoose.set("useCreateIndex", true);
+mongoose.set("useFindAndModify", false);
 require("dotenv").config();
 mongoose.Promise = global.Promise;
 mongoose.connect(
